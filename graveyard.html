@@ -5,46 +5,105 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Big Tech Graveyard — dự án đã chết</title>
 <style>
+  :root{
+    --bg:#0b0d12;
+    --bg-glow:
+      radial-gradient(1100px 550px at 8% -12%, rgba(255,106,77,.14), transparent 60%),
+      radial-gradient(900px 480px at 96% -6%, rgba(124,192,255,.10), transparent 55%);
+    --surface:#171a21;
+    --surface-2:#1e2330;
+    --border:#2a3040;
+    --border-hover:#4a5468;
+    --text:#eef0f4;
+    --muted:#98a2b3;
+    --accent:#ff6a4d;
+    --accent-2:#ffb547;
+    --accent-grad:linear-gradient(135deg,#ff6a4d,#ffb547);
+    --google:#7cc0ff;    --google-bd:#2c4c78;
+    --msft:#5be2a0;      --msft-bd:#255a44;
+    --apple:#e2a6ff;     --apple-bd:#4a2f66;
+    --sched:#ffcf5c;
+    --shadow:0 10px 28px rgba(0,0,0,.38);
+    --ease:cubic-bezier(.2,.8,.2,1);
+  }
   *{box-sizing:border-box}
-  body{margin:0;background:#0f1115;color:#e6e8ec;font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
-  header{padding:22px 20px 14px;border-bottom:1px solid #252a34}
-  h1{margin:0 0 4px;font-size:20px;letter-spacing:-.2px}
-  .sub{color:#8b93a1;font-size:13px}
+  body{margin:0;background:var(--bg-glow),var(--bg);background-attachment:fixed;color:var(--text);
+       font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+  header{position:relative;padding:26px 20px 18px;border-bottom:1px solid var(--border);
+         background:linear-gradient(180deg,rgba(255,106,77,.07),transparent)}
+  header::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:1px;
+                background:var(--accent-grad);opacity:.55}
+  h1{margin:0 0 4px;font-size:22px;font-weight:800;letter-spacing:-.2px}
+  h1 .grad{background:var(--accent-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:var(--muted);font-size:13px}
   .wrap{padding:16px 20px 60px}
-  .stats{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 16px}
-  .stat{background:#171a21;border:1px solid #252a34;border-radius:8px;padding:10px 14px;min-width:110px}
-  .stat b{display:block;font-size:22px;line-height:1.1}
-  .stat span{color:#8b93a1;font-size:11px;text-transform:uppercase;letter-spacing:.5px}
-  .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
-  input,select,button{background:#171a21;color:#e6e8ec;border:1px solid #252a34;border-radius:6px;padding:7px 10px;font:inherit}
+  .stats{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 16px;animation:fadeInUp .5s var(--ease) both}
+  .stat{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;min-width:110px;
+        transition:transform .18s var(--ease),box-shadow .18s var(--ease),border-color .18s var(--ease)}
+  .stat:hover{transform:translateY(-2px);border-color:var(--border-hover);box-shadow:var(--shadow)}
+  .stat b{display:block;font-size:22px;line-height:1.1;font-variant-numeric:tabular-nums}
+  .stat span{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px;
+            animation:fadeInUp .5s var(--ease) .05s both}
+  input,select,button{background:var(--surface);color:var(--text);border:1px solid var(--border);
+                       border-radius:8px;padding:7px 10px;font:inherit;
+                       transition:border-color .15s var(--ease),box-shadow .15s var(--ease),
+                                  transform .15s var(--ease),background .15s var(--ease),color .15s var(--ease)}
   input[type=search]{min-width:240px}
+  input:hover,select:hover{border-color:var(--border-hover)}
+  input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,106,77,.16)}
   button{cursor:pointer}
-  button:hover{border-color:#3d4553}
+  button:hover{border-color:var(--border-hover);transform:translateY(-1px);box-shadow:var(--shadow)}
+  button:active{transform:translateY(0)}
+  #csv:hover,#json:hover{background:var(--accent-grad);border-color:transparent;color:#1a1006}
   .chips{display:flex;gap:6px;flex-wrap:wrap}
-  .chip{padding:5px 11px;border-radius:99px;border:1px solid #252a34;background:#171a21;cursor:pointer;font-size:13px}
-  .chip.on{background:#e0533d;border-color:#e0533d;color:#fff}
+  .chip{padding:5px 11px;border-radius:99px;border:1px solid var(--border);background:var(--surface);
+        cursor:pointer;font-size:13px;transition:all .18s var(--ease)}
+  .chip:hover{border-color:var(--border-hover);transform:translateY(-1px)}
+  .chip.on{background:var(--accent-grad);border-color:transparent;color:#1a1006;font-weight:600;
+           box-shadow:0 4px 16px rgba(255,106,77,.35)}
   table{width:100%;border-collapse:collapse;font-size:13px}
   th,td{text-align:left;padding:8px 10px;border-bottom:1px solid #1d2129;vertical-align:top}
-  th{position:sticky;top:0;background:#0f1115;cursor:pointer;user-select:none;white-space:nowrap;font-size:12px;color:#8b93a1;text-transform:uppercase;letter-spacing:.4px}
-  th:hover{color:#e6e8ec}
-  tr:hover td{background:#14171d}
+  th{position:sticky;top:0;background:var(--bg);cursor:pointer;user-select:none;white-space:nowrap;
+     font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;transition:color .15s}
+  th:hover{color:var(--text)}
+  tr{animation:fadeInUp .28s var(--ease) both}
+  tr:hover td{background:var(--surface-2)}
+  td{transition:background .15s var(--ease)}
   td.name{font-weight:600}
-  td.desc{color:#8b93a1;max-width:420px}
-  .tag{display:inline-block;padding:1px 7px;border-radius:4px;font-size:11px;border:1px solid #252a34;color:#8b93a1}
-  .co-Google{color:#8ab4f8;border-color:#2a3a55}
-  .co-Microsoft{color:#7ed6a5;border-color:#264536}
-  .co-Apple{color:#d7a3f5;border-color:#3d2a4d}
-  .sched{color:#f0b429}
-  .bar{height:6px;background:#e0533d;border-radius:3px;display:inline-block;vertical-align:middle}
-  a{color:#8ab4f8}
-  .msg{padding:30px;text-align:center;color:#8b93a1}
-  .err{color:#e0533d}
-  footer{color:#8b93a1;font-size:12px;padding:20px;border-top:1px solid #252a34;margin-top:30px}
+  td.desc{color:var(--muted);max-width:420px}
+  .tag{display:inline-block;padding:1px 7px;border-radius:4px;font-size:11px;border:1px solid var(--border);
+       color:var(--muted);transition:all .15s var(--ease)}
+  .co-Google{color:var(--google);border-color:var(--google-bd)}
+  .co-Microsoft{color:var(--msft);border-color:var(--msft-bd)}
+  .co-Apple{color:var(--apple);border-color:var(--apple-bd)}
+  .sched{color:var(--sched);animation:pulseGlow 1.8s ease-in-out infinite}
+  .bar{height:6px;background:var(--accent-grad);border-radius:3px;display:inline-block;vertical-align:middle;
+       box-shadow:0 0 8px rgba(255,106,77,.45);transition:width .5s var(--ease)}
+  a{color:var(--google);transition:color .15s}
+  a:hover{color:var(--accent-2)}
+  .msg{padding:30px;text-align:center;color:var(--muted)}
+  .err{color:var(--accent)}
+  .loading{display:flex;flex-direction:column;align-items:center;gap:14px;padding:60px 20px;color:var(--muted)}
+  .spinner{width:32px;height:32px;border-radius:50%;border:3px solid var(--border);
+           border-top-color:var(--accent);animation:spin .8s linear infinite}
+  footer{color:var(--muted);font-size:12px;padding:20px;border-top:1px solid var(--border);margin-top:30px}
+
+  @keyframes fadeInUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes pulseGlow{0%,100%{opacity:1}50%{opacity:.5}}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{
+      animation-duration:.001ms!important;animation-iteration-count:1!important;
+      transition-duration:.001ms!important;scroll-behavior:auto!important;
+    }
+  }
 </style>
 </head>
 <body>
 <header>
-  <h1>🪦 Big Tech Graveyard</h1>
+  <h1>🪦 <span class="grad">Big Tech Graveyard</span></h1>
   <div class="sub">Dữ liệu kéo trực tiếp từ Killed by Google / Microsoft / Apple qua jsDelivr CDN — luôn mới, không cần scrape.</div>
 </header>
 
@@ -64,7 +123,7 @@
     <button id="json">⬇ Tải JSON</button>
   </div>
 
-  <div id="out"><div class="msg">Đang tải 3 nguồn…</div></div>
+  <div id="out"><div class="loading"><div class="spinner"></div><div class="msg">Đang tải 3 nguồn…</div></div></div>
 </div>
 
 <footer>
@@ -82,6 +141,7 @@ const SOURCES = [
 ];
 
 const TODAY = new Date();
+const REDUCE_MOTION = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const clean = s => String(s ?? '').replace(/\s+/g,' ').trim();
 const yr = s => { const d = new Date(s); return isNaN(d) ? null : d.getFullYear(); };
 
@@ -123,6 +183,23 @@ const FIELDS = ['company','name','type','date_open','date_close','year_open','ye
                 'date_precision','lifespan_years','status','description','link','source'];
 
 let ALL = [], active = new Set(), sortKey = 'year_close', sortDir = -1;
+
+// Đếm số chạy mượt từ giá trị cũ -> mới (bỏ qua nếu prefers-reduced-motion)
+function animateCount(el, from, to, decimals = 0){
+  if(REDUCE_MOTION || from === to){
+    el.textContent = decimals ? to.toFixed(decimals) : Math.round(to);
+    return;
+  }
+  const duration = 500, start = performance.now();
+  const step = now => {
+    const p = Math.min((now - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - p, 3);
+    const v = from + (to - from) * eased;
+    el.textContent = decimals ? v.toFixed(decimals) : Math.round(v);
+    if(p < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
 
 async function load(){
   const results = await Promise.allSettled(SOURCES.map(async s => {
@@ -187,23 +264,39 @@ function filtered(){
   });
 }
 
-function render(errs = []){
-  const rows = filtered();
-  const maxLife = Math.max(...ALL.map(r => r.lifespan_years || 0), 1);
+function renderStats(rows){
+  const statsEl = document.getElementById('stats');
+  const prev = [...statsEl.querySelectorAll('b')].map(b => parseFloat(b.textContent) || 0);
 
-  // stats
   const byCo = {};
   ALL.forEach(r => byCo[r.company] = (byCo[r.company]||0)+1);
   const lifes = ALL.map(r => r.lifespan_years).filter(v => v != null).sort((a,b)=>a-b);
   const median = lifes.length ? lifes[Math.floor(lifes.length/2)] : 0;
   const sched = ALL.filter(r => r.status === 'scheduled').length;
 
-  document.getElementById('stats').innerHTML =
-    `<div class="stat"><b>${ALL.length}</b><span>tổng mục</span></div>` +
-    Object.entries(byCo).map(([c,n]) => `<div class="stat"><b>${n}</b><span>${c}</span></div>`).join('') +
-    `<div class="stat"><b>${median}</b><span>tuổi thọ trung vị (năm)</span></div>` +
-    `<div class="stat"><b class="sched">${sched}</b><span>sắp khai tử</span></div>` +
-    `<div class="stat"><b>${rows.length}</b><span>đang hiển thị</span></div>`;
+  const items = [
+    [ALL.length, 'tổng mục'],
+    ...Object.entries(byCo).map(([c,n]) => [n, c]),
+    [median, 'tuổi thọ trung vị (năm)'],
+    [sched, 'sắp khai tử', 'sched'],
+    [rows.length, 'đang hiển thị'],
+  ];
+
+  statsEl.innerHTML = items.map(([val, label, cls]) =>
+    `<div class="stat"><b class="${cls||''}">0</b><span>${label}</span></div>`
+  ).join('');
+
+  [...statsEl.querySelectorAll('b')].forEach((b, i) => {
+    const [val] = items[i];
+    animateCount(b, prev[i] || 0, val, Number.isInteger(val) ? 0 : 1);
+  });
+}
+
+function render(errs = []){
+  const rows = filtered();
+  const maxLife = Math.max(...ALL.map(r => r.lifespan_years || 0), 1);
+
+  renderStats(rows);
 
   const cols = [
     ['company','Công ty'], ['name','Sản phẩm'], ['type','Loại'],
@@ -216,21 +309,30 @@ function render(errs = []){
     cols.map(([k,l]) => `<th data-k="${k}">${l}${sortKey===k ? (sortDir>0?' ▲':' ▼') : ''}</th>`).join('') +
     '</tr></thead><tbody>';
 
-  for(const r of rows.slice(0, 1200)){
+  const shown = rows.slice(0, 1200);
+  shown.forEach((r, i) => {
     const w = r.lifespan_years ? Math.max(2, r.lifespan_years / maxLife * 80) : 0;
-    h += `<tr>
+    const delay = REDUCE_MOTION ? 0 : Math.min(i, 16) * 12;
+    const barWidth = REDUCE_MOTION ? w : 0;
+    h += `<tr style="animation-delay:${delay}ms">
       <td><span class="tag co-${r.company}">${r.company}</span></td>
       <td class="name">${r.link ? `<a href="${r.link}" target="_blank" rel="noopener">${r.name}</a>` : r.name}</td>
       <td><span class="tag">${r.type || '—'}</span></td>
       <td>${r.year_open ?? '—'}</td>
       <td class="${r.status==='scheduled'?'sched':''}">${r.year_close ?? '—'}${r.status==='scheduled'?' ⏳':''}</td>
-      <td>${r.lifespan_years != null ? `<span class="bar" style="width:${w}px"></span> ${r.lifespan_years}` : '—'}</td>
+      <td>${r.lifespan_years != null ? `<span class="bar" data-w="${w}" style="width:${barWidth}px"></span> ${r.lifespan_years}` : '—'}</td>
       <td class="desc">${r.description || ''}</td>
     </tr>`;
-  }
+  });
   h += '</tbody></table>';
   if(rows.length > 1200) h += '<div class="msg">Chỉ hiển thị 1200 dòng đầu — dùng bộ lọc để thu hẹp.</div>';
   document.getElementById('out').innerHTML = h;
+
+  if(!REDUCE_MOTION){
+    requestAnimationFrame(() => {
+      document.querySelectorAll('.bar[data-w]').forEach(b => { b.style.width = b.dataset.w + 'px'; });
+    });
+  }
 
   document.querySelectorAll('th[data-k]').forEach(th => th.onclick = () => {
     const k = th.dataset.k;
