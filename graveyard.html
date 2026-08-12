@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Big Tech Graveyard — dự án đã chết</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#0f1115;color:#e6e8ec;font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+  header{padding:22px 20px 14px;border-bottom:1px solid #252a34}
+  h1{margin:0 0 4px;font-size:20px;letter-spacing:-.2px}
+  .sub{color:#8b93a1;font-size:13px}
+  .wrap{padding:16px 20px 60px}
+  .stats{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 16px}
+  .stat{background:#171a21;border:1px solid #252a34;border-radius:8px;padding:10px 14px;min-width:110px}
+  .stat b{display:block;font-size:22px;line-height:1.1}
+  .stat span{color:#8b93a1;font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+  input,select,button{background:#171a21;color:#e6e8ec;border:1px solid #252a34;border-radius:6px;padding:7px 10px;font:inherit}
+  input[type=search]{min-width:240px}
+  button{cursor:pointer}
+  button:hover{border-color:#3d4553}
+  .chips{display:flex;gap:6px;flex-wrap:wrap}
+  .chip{padding:5px 11px;border-radius:99px;border:1px solid #252a34;background:#171a21;cursor:pointer;font-size:13px}
+  .chip.on{background:#e0533d;border-color:#e0533d;color:#fff}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid #1d2129;vertical-align:top}
+  th{position:sticky;top:0;background:#0f1115;cursor:pointer;user-select:none;white-space:nowrap;font-size:12px;color:#8b93a1;text-transform:uppercase;letter-spacing:.4px}
+  th:hover{color:#e6e8ec}
+  tr:hover td{background:#14171d}
+  td.name{font-weight:600}
+  td.desc{color:#8b93a1;max-width:420px}
+  .tag{display:inline-block;padding:1px 7px;border-radius:4px;font-size:11px;border:1px solid #252a34;color:#8b93a1}
+  .co-Google{color:#8ab4f8;border-color:#2a3a55}
+  .co-Microsoft{color:#7ed6a5;border-color:#264536}
+  .co-Apple{color:#d7a3f5;border-color:#3d2a4d}
+  .sched{color:#f0b429}
+  .bar{height:6px;background:#e0533d;border-radius:3px;display:inline-block;vertical-align:middle}
+  a{color:#8ab4f8}
+  .msg{padding:30px;text-align:center;color:#8b93a1}
+  .err{color:#e0533d}
+  footer{color:#8b93a1;font-size:12px;padding:20px;border-top:1px solid #252a34;margin-top:30px}
+</style>
+</head>
+<body>
+<header>
+  <h1>🪦 Big Tech Graveyard</h1>
+  <div class="sub">Dữ liệu kéo trực tiếp từ Killed by Google / Microsoft / Apple qua jsDelivr CDN — luôn mới, không cần scrape.</div>
+</header>
+
+<div class="wrap">
+  <div class="stats" id="stats"></div>
+
+  <div class="controls">
+    <div class="chips" id="companyChips"></div>
+    <select id="typeSel"><option value="">Mọi loại</option></select>
+    <select id="statusSel">
+      <option value="">Mọi trạng thái</option>
+      <option value="dead">Đã chết</option>
+      <option value="scheduled">Sắp khai tử</option>
+    </select>
+    <input type="search" id="q" placeholder="Tìm tên / mô tả…">
+    <button id="csv">⬇ Tải CSV</button>
+    <button id="json">⬇ Tải JSON</button>
+  </div>
+
+  <div id="out"><div class="msg">Đang tải 3 nguồn…</div></div>
+</div>
+
+<footer>
+  Nguồn: <a href="https://killedbygoogle.com/">killedbygoogle.com</a> ·
+  <a href="https://killedbymicrosoft.info/">killedbymicrosoft.info</a> ·
+  <a href="https://killedbyapple.theden.sh/">killedbyapple.theden.sh</a><br>
+  Lưu ý: dữ liệu Apple chỉ có độ chính xác theo <b>năm</b> (born/died), Google & Microsoft có <b>ngày</b>.
+</footer>
+
+<script>
+const SOURCES = [
+  { company:'Google',    url:'https://cdn.jsdelivr.net/gh/codyogden/killedbygoogle@main/graveyard.json',        parser:'kbg', credit:'killedbygoogle.com' },
+  { company:'Microsoft', url:'https://cdn.jsdelivr.net/gh/fabianoriccardi/killed-by-microsoft@main/graveyard.json', parser:'kbg', credit:'killedbymicrosoft.info' },
+  { company:'Apple',     url:'https://cdn.jsdelivr.net/gh/TheDen/killed-by-apple@main/products.json',            parser:'kba', credit:'killedbyapple.theden.sh' },
+];
+
+const TODAY = new Date();
+const clean = s => String(s ?? '').replace(/\s+/g,' ').trim();
+const yr = s => { const d = new Date(s); return isNaN(d) ? null : d.getFullYear(); };
+
+// Killed by Google / Microsoft dùng chung schema
+function parseKbg(raw, company, credit){
+  return raw.map(it => {
+    const o = it.dateOpen ? new Date(it.dateOpen) : null;
+    const c = it.dateClose ? new Date(it.dateClose) : null;
+    return {
+      company, name: clean(it.name), type: clean(it.type).toLowerCase() || null,
+      date_open: it.dateOpen || null, date_close: it.dateClose || null,
+      year_open: yr(it.dateOpen), year_close: yr(it.dateClose),
+      date_precision: 'day',
+      lifespan_years: (o && c) ? +((c - o)/(365.25*864e5)).toFixed(1) : null,
+      status: (c && c > TODAY) ? 'scheduled' : 'dead',
+      description: clean(it.description), link: clean(it.link), source: credit
+    };
+  });
+}
+
+// Killed by Apple: chỉ có năm
+function parseKba(raw, company, credit){
+  const items = Array.isArray(raw) ? raw : (raw.products || []);
+  return items.map(it => ({
+    company, name: clean(it.name),
+    type: (it.cats || []).join(', ').toLowerCase() || null,
+    date_open: null, date_close: null,
+    year_open: it.born ?? null, year_close: it.died ?? null,
+    date_precision: 'year',
+    lifespan_years: (it.born && it.died) ? (it.died - it.born) : null,
+    status: (it.died && it.died > TODAY.getFullYear()) ? 'scheduled' : 'dead',
+    description: clean(it.desc),
+    link: (it.refs && it.refs[0] && it.refs[0].url) || '', source: credit
+  }));
+}
+
+const PARSERS = { kbg: parseKbg, kba: parseKba };
+const FIELDS = ['company','name','type','date_open','date_close','year_open','year_close',
+                'date_precision','lifespan_years','status','description','link','source'];
+
+let ALL = [], active = new Set(), sortKey = 'year_close', sortDir = -1;
+
+async function load(){
+  const results = await Promise.allSettled(SOURCES.map(async s => {
+    const r = await fetch(s.url);
+    if(!r.ok) throw new Error(s.company + ': HTTP ' + r.status);
+    return PARSERS[s.parser](await r.json(), s.company, s.credit);
+  }));
+
+  const errs = [];
+  results.forEach((r,i) => {
+    if(r.status === 'fulfilled') ALL.push(...r.value);
+    else errs.push(SOURCES[i].company + ' — ' + r.reason.message);
+  });
+
+  if(!ALL.length){
+    document.getElementById('out').innerHTML =
+      '<div class="msg err">Không tải được nguồn nào.<br>' + errs.join('<br>') +
+      '<br><br>Nếu bạn mở file này bằng file:// và trình duyệt chặn, hãy chạy:<br>' +
+      '<code>python3 -m http.server</code> rồi mở qua localhost.</div>';
+    return;
+  }
+
+  // dedupe (company + name)
+  const seen = new Map();
+  ALL.forEach(r => seen.set(r.company + '|' + r.name.toLowerCase(), r));
+  ALL = [...seen.values()];
+
+  active = new Set(SOURCES.map(s => s.company));
+  buildChips(); buildTypes(); render(errs);
+}
+
+function buildChips(){
+  const el = document.getElementById('companyChips');
+  el.innerHTML = '';
+  SOURCES.forEach(s => {
+    const b = document.createElement('button');
+    b.className = 'chip on'; b.textContent = s.company;
+    b.onclick = () => { active.has(s.company) ? active.delete(s.company) : active.add(s.company);
+                        b.classList.toggle('on'); render(); };
+    el.appendChild(b);
+  });
+}
+
+function buildTypes(){
+  const sel = document.getElementById('typeSel');
+  [...new Set(ALL.map(r => r.type).filter(Boolean))].sort()
+    .forEach(t => sel.add(new Option(t, t)));
+}
+
+function filtered(){
+  const q = document.getElementById('q').value.toLowerCase();
+  const t = document.getElementById('typeSel').value;
+  const st = document.getElementById('statusSel').value;
+  return ALL.filter(r =>
+    active.has(r.company) &&
+    (!t || r.type === t) &&
+    (!st || r.status === st) &&
+    (!q || r.name.toLowerCase().includes(q) || r.description.toLowerCase().includes(q))
+  ).sort((a,b) => {
+    const x = a[sortKey] ?? '', y = b[sortKey] ?? '';
+    return (x > y ? 1 : x < y ? -1 : 0) * sortDir;
+  });
+}
+
+function render(errs = []){
+  const rows = filtered();
+  const maxLife = Math.max(...ALL.map(r => r.lifespan_years || 0), 1);
+
+  // stats
+  const byCo = {};
+  ALL.forEach(r => byCo[r.company] = (byCo[r.company]||0)+1);
+  const lifes = ALL.map(r => r.lifespan_years).filter(v => v != null).sort((a,b)=>a-b);
+  const median = lifes.length ? lifes[Math.floor(lifes.length/2)] : 0;
+  const sched = ALL.filter(r => r.status === 'scheduled').length;
+
+  document.getElementById('stats').innerHTML =
+    `<div class="stat"><b>${ALL.length}</b><span>tổng mục</span></div>` +
+    Object.entries(byCo).map(([c,n]) => `<div class="stat"><b>${n}</b><span>${c}</span></div>`).join('') +
+    `<div class="stat"><b>${median}</b><span>tuổi thọ trung vị (năm)</span></div>` +
+    `<div class="stat"><b class="sched">${sched}</b><span>sắp khai tử</span></div>` +
+    `<div class="stat"><b>${rows.length}</b><span>đang hiển thị</span></div>`;
+
+  const cols = [
+    ['company','Công ty'], ['name','Sản phẩm'], ['type','Loại'],
+    ['year_open','Ra mắt'], ['year_close','Khai tử'],
+    ['lifespan_years','Tuổi thọ'], ['description','Mô tả']
+  ];
+
+  let h = (errs.length ? `<div class="msg err">⚠ ${errs.join(' · ')}</div>` : '') +
+    '<table><thead><tr>' +
+    cols.map(([k,l]) => `<th data-k="${k}">${l}${sortKey===k ? (sortDir>0?' ▲':' ▼') : ''}</th>`).join('') +
+    '</tr></thead><tbody>';
+
+  for(const r of rows.slice(0, 1200)){
+    const w = r.lifespan_years ? Math.max(2, r.lifespan_years / maxLife * 80) : 0;
+    h += `<tr>
+      <td><span class="tag co-${r.company}">${r.company}</span></td>
+      <td class="name">${r.link ? `<a href="${r.link}" target="_blank" rel="noopener">${r.name}</a>` : r.name}</td>
+      <td><span class="tag">${r.type || '—'}</span></td>
+      <td>${r.year_open ?? '—'}</td>
+      <td class="${r.status==='scheduled'?'sched':''}">${r.year_close ?? '—'}${r.status==='scheduled'?' ⏳':''}</td>
+      <td>${r.lifespan_years != null ? `<span class="bar" style="width:${w}px"></span> ${r.lifespan_years}` : '—'}</td>
+      <td class="desc">${r.description || ''}</td>
+    </tr>`;
+  }
+  h += '</tbody></table>';
+  if(rows.length > 1200) h += '<div class="msg">Chỉ hiển thị 1200 dòng đầu — dùng bộ lọc để thu hẹp.</div>';
+  document.getElementById('out').innerHTML = h;
+
+  document.querySelectorAll('th[data-k]').forEach(th => th.onclick = () => {
+    const k = th.dataset.k;
+    if(sortKey === k) sortDir *= -1; else { sortKey = k; sortDir = -1; }
+    render();
+  });
+}
+
+function download(name, text, mime){
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text], {type: mime}));
+  a.download = name; a.click(); URL.revokeObjectURL(a.href);
+}
+
+document.getElementById('csv').onclick = () => {
+  const esc = v => `"${String(v ?? '').replace(/"/g,'""')}"`;
+  const rows = filtered();
+  download('graveyard.csv',
+    '﻿' + [FIELDS.join(','), ...rows.map(r => FIELDS.map(f => esc(r[f])).join(','))].join('\n'),
+    'text/csv');
+};
+document.getElementById('json').onclick = () =>
+  download('graveyard.json', JSON.stringify(filtered(), null, 2), 'application/json');
+
+['q','typeSel','statusSel'].forEach(id =>
+  document.getElementById(id).addEventListener('input', () => render()));
+
+load();
+</script>
+</body>
+</html>
