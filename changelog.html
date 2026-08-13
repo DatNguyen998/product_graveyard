@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Changelog — Big Tech Graveyard</title>
+<style>
+  :root{
+    --text:#1c2333;
+    --muted:#5b6478;
+    --glass:rgba(255,255,255,.52);
+    --glass-strong:rgba(255,255,255,.72);
+    --glass-border:rgba(255,255,255,.6);
+    --border-soft:rgba(28,35,51,.09);
+    --border-soft-hover:rgba(28,35,51,.2);
+    --glass-shadow:0 24px 64px rgba(15,20,60,.28);
+    --tile-shadow:0 10px 26px rgba(15,20,60,.18);
+    --accent:#3b6fe0;
+    --accent-2:#7c3aed;
+    --accent-grad:linear-gradient(135deg,#3b6fe0,#7c3aed);
+    --added:#0f8a52;      --added-bg:rgba(15,138,82,.12);    --added-bd:rgba(15,138,82,.28);
+    --changed:#1a56c9;    --changed-bg:rgba(26,86,201,.12);  --changed-bd:rgba(26,86,201,.28);
+    --fixed:#a86a00;      --fixed-bg:rgba(168,106,0,.12);    --fixed-bd:rgba(168,106,0,.28);
+    --ease:cubic-bezier(.2,.8,.2,1);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;color:var(--text);
+    font:14px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    background:
+      radial-gradient(1100px 760px at 10% 6%,#7fb2ff 0%,transparent 55%),
+      radial-gradient(950px 720px at 92% 4%,#a685ff 0%,transparent 55%),
+      radial-gradient(1150px 880px at 50% 108%,#3f5fe0 0%,transparent 58%),
+      linear-gradient(160deg,#16215c 0%,#0d1548 55%,#05081f 100%);
+    background-attachment:fixed;
+    display:flex;justify-content:center;
+    padding:32px 16px 48px;
+  }
+  .app{
+    width:100%;max-width:860px;height:fit-content;
+    background:var(--glass);
+    backdrop-filter:blur(28px) saturate(180%);
+    -webkit-backdrop-filter:blur(28px) saturate(180%);
+    border:1px solid var(--glass-border);
+    border-radius:22px;
+    box-shadow:var(--glass-shadow);
+    overflow:hidden;
+    animation:fadeInUp .5s var(--ease) both;
+  }
+  header{position:relative;padding:26px 28px 18px;border-bottom:1px solid var(--border-soft)}
+  .back{display:inline-flex;align-items:center;gap:6px;color:var(--muted);text-decoration:none;
+        font-size:12.5px;margin-bottom:10px;transition:color .15s var(--ease)}
+  .back:hover{color:var(--accent)}
+  h1{margin:0 0 4px;font-size:22px;font-weight:800;letter-spacing:-.2px;color:var(--text)}
+  h1 .grad{background:var(--accent-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:var(--muted);font-size:13px;max-width:56ch}
+
+  .timeline{padding:26px 28px 34px;position:relative}
+  .timeline::before{
+    content:'';position:absolute;left:47px;top:26px;bottom:34px;width:2px;
+    background:linear-gradient(var(--accent),var(--accent-2));opacity:.25;
+  }
+  .entry{position:relative;padding:0 0 30px 46px;animation:fadeInUp .45s var(--ease) both}
+  .entry:last-child{padding-bottom:0}
+  .entry::before{
+    content:'';position:absolute;left:14px;top:5px;width:11px;height:11px;border-radius:50%;
+    background:var(--accent-grad);box-shadow:0 0 0 4px var(--glass-strong),0 0 12px rgba(59,111,224,.5);
+  }
+  .entry-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px;margin-bottom:4px}
+  .ver{display:inline-block;background:var(--accent-grad);color:#fff;font-weight:700;
+       font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+       font-size:12.5px;padding:3px 10px;border-radius:99px;letter-spacing:.2px}
+  .entry-title{font-size:16px;font-weight:700;color:var(--text)}
+  .date{color:var(--muted);font-size:12px;margin-left:auto}
+  .badges{display:flex;gap:6px;margin:8px 0 12px}
+  .badge{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;
+         padding:2px 8px;border-radius:5px;border:1px solid}
+  .badge.added{color:var(--added);background:var(--added-bg);border-color:var(--added-bd)}
+  .badge.changed{color:var(--changed);background:var(--changed-bg);border-color:var(--changed-bd)}
+  .badge.fixed{color:var(--fixed);background:var(--fixed-bg);border-color:var(--fixed-bd)}
+
+  ul.changes{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px}
+  ul.changes>li{position:relative;padding-left:16px}
+  ul.changes>li::before{content:'';position:absolute;left:0;top:8px;width:5px;height:5px;
+                         border-radius:50%;background:var(--muted);opacity:.6}
+  .desc{color:var(--text)}
+  .impacts{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-top:6px}
+  .impacts .label{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.4px;margin-right:2px}
+  code.tag{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11.5px;
+       background:var(--glass-strong);border:1px solid var(--border-soft);color:var(--text);
+       padding:2px 7px;border-radius:5px}
+  .none{color:var(--muted);font-style:italic;font-size:12.5px}
+
+  footer{color:var(--muted);font-size:12px;padding:16px 28px 22px;border-top:1px solid var(--border-soft)}
+  footer a{color:var(--accent);text-decoration:none}
+  footer a:hover{color:var(--changed)}
+
+  @keyframes fadeInUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <a class="back" href="graveyard.html">← Back to dashboard</a>
+    <h1>📜 <span class="grad">Changelog</span></h1>
+    <div class="sub">What changed in each version of Big Tech Graveyard, and exactly which files/functions it touched. Full source: <code class="tag">CHANGELOG.md</code>.</div>
+  </header>
+
+  <div class="timeline">
+
+    <article class="entry">
+      <div class="entry-head">
+        <span class="ver">v0.4.1</span>
+        <span class="entry-title">Accent color matched to the glass theme</span>
+        <span class="date">2026-08-13</span>
+      </div>
+      <div class="badges"><span class="badge changed">Changed</span></div>
+      <ul class="changes">
+        <li>
+          <div class="desc">Swapped the leftover warm orange/gold accent (a holdover from the old dark theme) for a blue-to-violet gradient pulled from the background, so the UI reads as one cohesive palette instead of clashing.</div>
+          <div class="impacts">
+            <span class="label">Impacts</span>
+            <code class="tag">graveyard.html</code>
+            <code class="tag">--accent</code>
+            <code class="tag">--accent-2</code>
+            <code class="tag">--accent-deep</code>
+            <code class="tag">--accent-grad</code>
+            <code class="tag">.chip.on</code>
+            <code class="tag">.bar</code>
+            <code class="tag">#csv:hover / #json:hover</code>
+          </div>
+        </li>
+      </ul>
+    </article>
+
+    <article class="entry">
+      <div class="entry-head">
+        <span class="ver">v0.4.0</span>
+        <span class="entry-title">Frosted-glass redesign</span>
+        <span class="date">2026-08-13</span>
+      </div>
+      <div class="badges"><span class="badge changed">Changed</span></div>
+      <ul class="changes">
+        <li>
+          <div class="desc">Replaced the dark "graveyard" theme with a glassmorphism UI: one translucent, blurred card floating over a blue/purple gradient background, dark-navy text on light glass, tinted pill backgrounds on company tags.</div>
+          <div class="impacts">
+            <span class="label">Impacts</span>
+            <code class="tag">graveyard.html</code>
+            <code class="tag">.app (new wrapper)</code>
+            <code class="tag">:root tokens</code>
+            <code class="tag">header</code>
+            <code class="tag">.stat</code>
+            <code class="tag">input/select/button</code>
+            <code class="tag">.chip</code>
+            <code class="tag">table th</code>
+            <code class="tag">.tag</code>
+          </div>
+        </li>
+        <li>
+          <div class="desc">No behavioral/logic changes — data fetching, parsing, filtering, sorting, and animation are all untouched.</div>
+          <div class="impacts">
+            <span class="label">Impacts</span>
+            <span class="none">none — parseKbg(), parseKba(), load(), filtered(), render(), renderStats(), animateCount() unchanged</span>
+          </div>
+        </li>
+      </ul>
+    </article>
+
+    <article class="entry">
+      <div class="entry-head">
+        <span class="ver">v0.3.0</span>
+        <span class="entry-title">Brighter UI + motion</span>
+        <span class="date">2026-08-12</span>
+      </div>
+      <div class="badges"><span class="badge added">Added</span><span class="badge changed">Changed</span></div>
+      <ul class="changes">
+        <li>
+          <div class="desc">Count-up animation for the stat tiles on every filter change.</div>
+          <div class="impacts">
+            <span class="label">Impacts</span>
+            <code class="tag">graveyard.html</code>
+            <code class="tag">animateCount() — new</code>
+            <code class="tag">renderStats() — extracted</code>
+          </div>
+        </li>
+        <li>
+          <div class="desc">Staggered fade-in for table rows, animated bar growth for the lifespan column, a pulsing "scheduled" badge, and a loading spinner.</div>
+          <div class="impacts">
+            <span class="label">Impacts</span>
+            <code class="tag">graveyard.html</code>
+            <code class="tag">render()</code>
+            <code class="tag">load()</code>
+            <code class="tag">@keyframes fadeInUp/pulseGlow/spin</code>
+          </div>
+        </li>
+        <li>
+          <div class="desc">Respect for prefers-reduced-motion — animation/transition durations collapse to ~0 for users who've asked for reduced motion.</div>
+          <div class="impacts">
+            <span class="label">Impacts</span>
+            <code class="tag">graveyard.html</code>
+            <code class="tag">REDUCE_MOTION — new</code>
+            <code class="tag">@media (prefers-reduced-motion)</code>
+          </div>
+        </li>
+        <li>
+          <div class="desc">Brighter, more saturated color palette (still dark-based at this point) — gradient accent, higher-saturation company tag colors.</div>
+          <div class="impacts">
+            <span class="label">Impacts</span>
+            <code class="tag">graveyard.html</code>
+            <code class="tag">:root tokens only</code>
+          </div>
+        </li>
+      </ul>
+    </article>
+
+    <article class="entry">
+      <div class="entry-head">
+        <span class="ver">v0.2.0</span>
+        <span class="entry-title">Documentation</span>
+        <span class="date">2026-08-12</span>
+      </div>
+      <div class="badges"><span class="badge added">Added</span></div>
+      <ul class="changes">
+        <li>
+          <div class="desc">Full project README: overview, file inventory, data schema reference, CLI + dashboard usage instructions, requirements, and source credits.</div>
+          <div class="impacts">
+            <span class="label">Impacts</span>
+            <code class="tag">README.md — rewritten from a 1-line stub</code>
+            <span class="none">no code impact</span>
+          </div>
+        </li>
+      </ul>
+    </article>
+
+    <article class="entry">
+      <div class="entry-head">
+        <span class="ver">v0.1.0</span>
+        <span class="entry-title">Initial release</span>
+        <span class="date">2026-08-12</span>
+      </div>
+      <div class="badges"><span class="badge added">Added</span></div>
+      <ul class="changes">
+        <li>
+          <div class="desc">The data-aggregation CLI: fetches the three upstream graveyard datasets, normalizes them to one schema, dedupes, runs basic QA, and exports JSON/CSV (optionally XLSX).</div>
+          <div class="impacts">
+            <span class="label">Impacts</span>
+            <code class="tag">graveyard.py — new</code>
+            <code class="tag">fetch_json()</code>
+            <code class="tag">parse_date()</code>
+            <code class="tag">years_between()</code>
+            <code class="tag">clean()</code>
+            <code class="tag">parse_kbg()</code>
+            <code class="tag">parse_kba()</code>
+            <code class="tag">build()</code>
+            <code class="tag">qa()</code>
+            <code class="tag">main()</code>
+          </div>
+        </li>
+        <li>
+          <div class="desc">The browser dashboard: fetches the same three sources client-side and renders a sortable, filterable, searchable table with CSV/JSON export.</div>
+          <div class="impacts">
+            <span class="label">Impacts</span>
+            <code class="tag">graveyard.html — new</code>
+            <code class="tag">parseKbg()</code>
+            <code class="tag">parseKba()</code>
+            <code class="tag">load()</code>
+            <code class="tag">buildChips()</code>
+            <code class="tag">buildTypes()</code>
+            <code class="tag">filtered()</code>
+            <code class="tag">render()</code>
+            <code class="tag">download()</code>
+          </div>
+        </li>
+      </ul>
+    </article>
+
+  </div>
+
+  <footer>
+    Generated from git history — see <code class="tag">CHANGELOG.md</code> in the repo root for the plain-text version.
+  </footer>
+</div>
+</body>
+</html>
