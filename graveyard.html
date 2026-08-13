@@ -6,91 +6,112 @@
 <title>Big Tech Graveyard — dự án đã chết</title>
 <style>
   :root{
-    --bg:#0b0d12;
-    --bg-glow:
-      radial-gradient(1100px 550px at 8% -12%, rgba(255,106,77,.14), transparent 60%),
-      radial-gradient(900px 480px at 96% -6%, rgba(124,192,255,.10), transparent 55%);
-    --surface:#171a21;
-    --surface-2:#1e2330;
-    --border:#2a3040;
-    --border-hover:#4a5468;
-    --text:#eef0f4;
-    --muted:#98a2b3;
-    --accent:#ff6a4d;
-    --accent-2:#ffb547;
-    --accent-grad:linear-gradient(135deg,#ff6a4d,#ffb547);
-    --google:#7cc0ff;    --google-bd:#2c4c78;
-    --msft:#5be2a0;      --msft-bd:#255a44;
-    --apple:#e2a6ff;     --apple-bd:#4a2f66;
-    --sched:#ffcf5c;
-    --shadow:0 10px 28px rgba(0,0,0,.38);
+    --text:#1c2333;
+    --muted:#5b6478;
+    --glass:rgba(255,255,255,.52);
+    --glass-strong:rgba(255,255,255,.72);
+    --glass-border:rgba(255,255,255,.6);
+    --border-soft:rgba(28,35,51,.09);
+    --border-soft-hover:rgba(28,35,51,.2);
+    --glass-shadow:0 24px 64px rgba(15,20,60,.28);
+    --tile-shadow:0 10px 26px rgba(15,20,60,.18);
+    --accent:#3b6fe0;
+    --accent-2:#7c3aed;
+    --accent-deep:#4a3bc9;
+    --accent-grad:linear-gradient(135deg,#3b6fe0,#7c3aed);
+    --google:#1a56c9;    --google-bg:rgba(26,86,201,.12);   --google-bd:rgba(26,86,201,.28);
+    --msft:#0f8a52;      --msft-bg:rgba(15,138,82,.12);     --msft-bd:rgba(15,138,82,.28);
+    --apple:#7a2fd1;     --apple-bg:rgba(122,47,209,.12);   --apple-bd:rgba(122,47,209,.28);
+    --sched:#a86a00;
     --ease:cubic-bezier(.2,.8,.2,1);
   }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg-glow),var(--bg);background-attachment:fixed;color:var(--text);
-       font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
-  header{position:relative;padding:26px 20px 18px;border-bottom:1px solid var(--border);
-         background:linear-gradient(180deg,rgba(255,106,77,.07),transparent)}
-  header::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:1px;
-                background:var(--accent-grad);opacity:.55}
-  h1{margin:0 0 4px;font-size:22px;font-weight:800;letter-spacing:-.2px}
+  html,body{height:100%}
+  body{
+    margin:0;color:var(--text);
+    font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    background:
+      radial-gradient(1100px 760px at 10% 6%,#7fb2ff 0%,transparent 55%),
+      radial-gradient(950px 720px at 92% 4%,#a685ff 0%,transparent 55%),
+      radial-gradient(1150px 880px at 50% 108%,#3f5fe0 0%,transparent 58%),
+      linear-gradient(160deg,#16215c 0%,#0d1548 55%,#05081f 100%);
+    background-attachment:fixed;
+    display:flex;justify-content:center;
+    padding:32px 16px 48px;
+  }
+  .app{
+    width:100%;max-width:1180px;height:fit-content;
+    background:var(--glass);
+    backdrop-filter:blur(28px) saturate(180%);
+    -webkit-backdrop-filter:blur(28px) saturate(180%);
+    border:1px solid var(--glass-border);
+    border-radius:22px;
+    box-shadow:var(--glass-shadow);
+    overflow:hidden;
+    animation:fadeInUp .5s var(--ease) both;
+  }
+  header{position:relative;padding:26px 24px 18px;border-bottom:1px solid var(--border-soft)}
+  h1{margin:0 0 4px;font-size:22px;font-weight:800;letter-spacing:-.2px;color:var(--text)}
   h1 .grad{background:var(--accent-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
   .sub{color:var(--muted);font-size:13px}
-  .wrap{padding:16px 20px 60px}
-  .stats{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 16px;animation:fadeInUp .5s var(--ease) both}
-  .stat{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;min-width:110px;
+  .wrap{padding:18px 24px 36px}
+  .stats{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 16px}
+  .stat{background:var(--glass-strong);border:1px solid var(--border-soft);border-radius:12px;
+        padding:10px 14px;min-width:110px;
         transition:transform .18s var(--ease),box-shadow .18s var(--ease),border-color .18s var(--ease)}
-  .stat:hover{transform:translateY(-2px);border-color:var(--border-hover);box-shadow:var(--shadow)}
-  .stat b{display:block;font-size:22px;line-height:1.1;font-variant-numeric:tabular-nums}
+  .stat:hover{transform:translateY(-2px);border-color:var(--border-soft-hover);box-shadow:var(--tile-shadow)}
+  .stat b{display:block;font-size:22px;line-height:1.1;font-variant-numeric:tabular-nums;color:var(--text)}
   .stat span{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.5px}
-  .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px;
-            animation:fadeInUp .5s var(--ease) .05s both}
-  input,select,button{background:var(--surface);color:var(--text);border:1px solid var(--border);
-                       border-radius:8px;padding:7px 10px;font:inherit;
+  .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+  input,select,button{background:var(--glass-strong);color:var(--text);border:1px solid var(--border-soft);
+                       border-radius:9px;padding:7px 11px;font:inherit;
                        transition:border-color .15s var(--ease),box-shadow .15s var(--ease),
                                   transform .15s var(--ease),background .15s var(--ease),color .15s var(--ease)}
   input[type=search]{min-width:240px}
-  input:hover,select:hover{border-color:var(--border-hover)}
-  input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,106,77,.16)}
+  input::placeholder{color:var(--muted)}
+  input:hover,select:hover{border-color:var(--border-soft-hover)}
+  input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(59,111,224,.22)}
   button{cursor:pointer}
-  button:hover{border-color:var(--border-hover);transform:translateY(-1px);box-shadow:var(--shadow)}
+  button:hover{border-color:var(--border-soft-hover);transform:translateY(-1px);box-shadow:var(--tile-shadow)}
   button:active{transform:translateY(0)}
-  #csv:hover,#json:hover{background:var(--accent-grad);border-color:transparent;color:#1a1006}
+  #csv:hover,#json:hover{background:var(--accent-grad);border-color:transparent;color:#fff}
   .chips{display:flex;gap:6px;flex-wrap:wrap}
-  .chip{padding:5px 11px;border-radius:99px;border:1px solid var(--border);background:var(--surface);
-        cursor:pointer;font-size:13px;transition:all .18s var(--ease)}
-  .chip:hover{border-color:var(--border-hover);transform:translateY(-1px)}
-  .chip.on{background:var(--accent-grad);border-color:transparent;color:#1a1006;font-weight:600;
-           box-shadow:0 4px 16px rgba(255,106,77,.35)}
+  .chip{padding:5px 12px;border-radius:99px;border:1px solid var(--border-soft);background:var(--glass-strong);
+        color:var(--text);cursor:pointer;font-size:13px;transition:all .18s var(--ease)}
+  .chip:hover{border-color:var(--border-soft-hover);transform:translateY(-1px)}
+  .chip.on{background:var(--accent-grad);border-color:transparent;color:#fff;font-weight:600;
+           box-shadow:0 4px 16px rgba(59,111,224,.35)}
   table{width:100%;border-collapse:collapse;font-size:13px}
-  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid #1d2129;vertical-align:top}
-  th{position:sticky;top:0;background:var(--bg);cursor:pointer;user-select:none;white-space:nowrap;
+  th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--border-soft);vertical-align:top}
+  th{position:sticky;top:0;background:var(--glass-strong);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+     cursor:pointer;user-select:none;white-space:nowrap;
      font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;transition:color .15s}
   th:hover{color:var(--text)}
   tr{animation:fadeInUp .28s var(--ease) both}
-  tr:hover td{background:var(--surface-2)}
+  tr:hover td{background:rgba(255,255,255,.45)}
   td{transition:background .15s var(--ease)}
   td.name{font-weight:600}
   td.desc{color:var(--muted);max-width:420px}
-  .tag{display:inline-block;padding:1px 7px;border-radius:4px;font-size:11px;border:1px solid var(--border);
-       color:var(--muted);transition:all .15s var(--ease)}
-  .co-Google{color:var(--google);border-color:var(--google-bd)}
-  .co-Microsoft{color:var(--msft);border-color:var(--msft-bd)}
-  .co-Apple{color:var(--apple);border-color:var(--apple-bd)}
-  .sched{color:var(--sched);animation:pulseGlow 1.8s ease-in-out infinite}
+  .tag{display:inline-block;padding:1px 8px;border-radius:5px;font-size:11px;border:1px solid var(--border-soft);
+       color:var(--muted);background:rgba(255,255,255,.4);transition:all .15s var(--ease)}
+  .co-Google{color:var(--google);background:var(--google-bg);border-color:var(--google-bd)}
+  .co-Microsoft{color:var(--msft);background:var(--msft-bg);border-color:var(--msft-bd)}
+  .co-Apple{color:var(--apple);background:var(--apple-bg);border-color:var(--apple-bd)}
+  .sched{color:var(--sched);font-weight:600;animation:pulseGlow 1.8s ease-in-out infinite}
   .bar{height:6px;background:var(--accent-grad);border-radius:3px;display:inline-block;vertical-align:middle;
-       box-shadow:0 0 8px rgba(255,106,77,.45);transition:width .5s var(--ease)}
+       box-shadow:0 0 8px rgba(59,111,224,.4);transition:width .5s var(--ease)}
   a{color:var(--google);transition:color .15s}
-  a:hover{color:var(--accent-2)}
+  a:hover{color:var(--accent-deep)}
   .msg{padding:30px;text-align:center;color:var(--muted)}
-  .err{color:var(--accent)}
+  .err{color:var(--accent-deep)}
   .loading{display:flex;flex-direction:column;align-items:center;gap:14px;padding:60px 20px;color:var(--muted)}
-  .spinner{width:32px;height:32px;border-radius:50%;border:3px solid var(--border);
+  .spinner{width:32px;height:32px;border-radius:50%;border:3px solid var(--border-soft);
            border-top-color:var(--accent);animation:spin .8s linear infinite}
-  footer{color:var(--muted);font-size:12px;padding:20px;border-top:1px solid var(--border);margin-top:30px}
+  footer{color:var(--muted);font-size:12px;padding:18px 24px;border-top:1px solid var(--border-soft)}
+  footer a{color:var(--google)}
 
-  @keyframes fadeInUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-  @keyframes pulseGlow{0%,100%{opacity:1}50%{opacity:.5}}
+  @keyframes fadeInUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes pulseGlow{0%,100%{opacity:1}50%{opacity:.55}}
   @keyframes spin{to{transform:rotate(360deg)}}
 
   @media (prefers-reduced-motion: reduce){
@@ -102,36 +123,38 @@
 </style>
 </head>
 <body>
-<header>
-  <h1>🪦 <span class="grad">Big Tech Graveyard</span></h1>
-  <div class="sub">Dữ liệu kéo trực tiếp từ Killed by Google / Microsoft / Apple qua jsDelivr CDN — luôn mới, không cần scrape.</div>
-</header>
+<div class="app">
+  <header>
+    <h1>🪦 <span class="grad">Big Tech Graveyard</span></h1>
+    <div class="sub">Dữ liệu kéo trực tiếp từ Killed by Google / Microsoft / Apple qua jsDelivr CDN — luôn mới, không cần scrape.</div>
+  </header>
 
-<div class="wrap">
-  <div class="stats" id="stats"></div>
+  <div class="wrap">
+    <div class="stats" id="stats"></div>
 
-  <div class="controls">
-    <div class="chips" id="companyChips"></div>
-    <select id="typeSel"><option value="">Mọi loại</option></select>
-    <select id="statusSel">
-      <option value="">Mọi trạng thái</option>
-      <option value="dead">Đã chết</option>
-      <option value="scheduled">Sắp khai tử</option>
-    </select>
-    <input type="search" id="q" placeholder="Tìm tên / mô tả…">
-    <button id="csv">⬇ Tải CSV</button>
-    <button id="json">⬇ Tải JSON</button>
+    <div class="controls">
+      <div class="chips" id="companyChips"></div>
+      <select id="typeSel"><option value="">Mọi loại</option></select>
+      <select id="statusSel">
+        <option value="">Mọi trạng thái</option>
+        <option value="dead">Đã chết</option>
+        <option value="scheduled">Sắp khai tử</option>
+      </select>
+      <input type="search" id="q" placeholder="Tìm tên / mô tả…">
+      <button id="csv">⬇ Tải CSV</button>
+      <button id="json">⬇ Tải JSON</button>
+    </div>
+
+    <div id="out"><div class="loading"><div class="spinner"></div><div class="msg">Đang tải 3 nguồn…</div></div></div>
   </div>
 
-  <div id="out"><div class="loading"><div class="spinner"></div><div class="msg">Đang tải 3 nguồn…</div></div></div>
+  <footer>
+    Nguồn: <a href="https://killedbygoogle.com/">killedbygoogle.com</a> ·
+    <a href="https://killedbymicrosoft.info/">killedbymicrosoft.info</a> ·
+    <a href="https://killedbyapple.theden.sh/">killedbyapple.theden.sh</a><br>
+    Lưu ý: dữ liệu Apple chỉ có độ chính xác theo <b>năm</b> (born/died), Google & Microsoft có <b>ngày</b>.
+  </footer>
 </div>
-
-<footer>
-  Nguồn: <a href="https://killedbygoogle.com/">killedbygoogle.com</a> ·
-  <a href="https://killedbymicrosoft.info/">killedbymicrosoft.info</a> ·
-  <a href="https://killedbyapple.theden.sh/">killedbyapple.theden.sh</a><br>
-  Lưu ý: dữ liệu Apple chỉ có độ chính xác theo <b>năm</b> (born/died), Google & Microsoft có <b>ngày</b>.
-</footer>
 
 <script>
 const SOURCES = [
