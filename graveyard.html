@@ -15,10 +15,10 @@
     --border-soft-hover:rgba(28,35,51,.2);
     --glass-shadow:0 24px 64px rgba(15,20,60,.28);
     --tile-shadow:0 10px 26px rgba(15,20,60,.18);
-    --accent:#ff6a4d;
-    --accent-2:#ffb547;
-    --accent-deep:#d1481f;
-    --accent-grad:linear-gradient(135deg,#ff6a4d,#ffb547);
+    --accent:#3b6fe0;
+    --accent-2:#7c3aed;
+    --accent-deep:#4a3bc9;
+    --accent-grad:linear-gradient(135deg,#3b6fe0,#7c3aed);
     --google:#1a56c9;    --google-bg:rgba(26,86,201,.12);   --google-bd:rgba(26,86,201,.28);
     --msft:#0f8a52;      --msft-bg:rgba(15,138,82,.12);     --msft-bd:rgba(15,138,82,.28);
     --apple:#7a2fd1;     --apple-bg:rgba(122,47,209,.12);   --apple-bd:rgba(122,47,209,.28);
@@ -70,17 +70,17 @@
   input[type=search]{min-width:240px}
   input::placeholder{color:var(--muted)}
   input:hover,select:hover{border-color:var(--border-soft-hover)}
-  input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,106,77,.18)}
+  input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(59,111,224,.22)}
   button{cursor:pointer}
   button:hover{border-color:var(--border-soft-hover);transform:translateY(-1px);box-shadow:var(--tile-shadow)}
   button:active{transform:translateY(0)}
-  #csv:hover,#json:hover{background:var(--accent-grad);border-color:transparent;color:#3a1200}
+  #csv:hover,#json:hover{background:var(--accent-grad);border-color:transparent;color:#fff}
   .chips{display:flex;gap:6px;flex-wrap:wrap}
   .chip{padding:5px 12px;border-radius:99px;border:1px solid var(--border-soft);background:var(--glass-strong);
         color:var(--text);cursor:pointer;font-size:13px;transition:all .18s var(--ease)}
   .chip:hover{border-color:var(--border-soft-hover);transform:translateY(-1px)}
-  .chip.on{background:var(--accent-grad);border-color:transparent;color:#3a1200;font-weight:600;
-           box-shadow:0 4px 16px rgba(255,106,77,.35)}
+  .chip.on{background:var(--accent-grad);border-color:transparent;color:#fff;font-weight:600;
+           box-shadow:0 4px 16px rgba(59,111,224,.35)}
   table{width:100%;border-collapse:collapse;font-size:13px}
   th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--border-soft);vertical-align:top}
   th{position:sticky;top:0;background:var(--glass-strong);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
@@ -99,7 +99,7 @@
   .co-Apple{color:var(--apple);background:var(--apple-bg);border-color:var(--apple-bd)}
   .sched{color:var(--sched);font-weight:600;animation:pulseGlow 1.8s ease-in-out infinite}
   .bar{height:6px;background:var(--accent-grad);border-radius:3px;display:inline-block;vertical-align:middle;
-       box-shadow:0 0 8px rgba(255,106,77,.4);transition:width .5s var(--ease)}
+       box-shadow:0 0 8px rgba(59,111,224,.4);transition:width .5s var(--ease)}
   a{color:var(--google);transition:color .15s}
   a:hover{color:var(--accent-deep)}
   .msg{padding:30px;text-align:center;color:var(--muted)}
