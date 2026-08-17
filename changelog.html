@@ -114,6 +114,54 @@
 
     <article class="entry">
       <div class="entry-head">
+        <span class="ver">v0.5.0</span>
+        <span class="entry-title">Static data snapshot instead of live client-side fetch</span>
+        <span class="date">2026-08-17</span>
+      </div>
+      <div class="badges"><span class="badge added">Added</span><span class="badge changed">Changed</span></div>
+      <ul class="changes">
+        <li>
+          <div class="desc">graveyard.py now also writes graveyard_all.meta.json (generation timestamp, per-company counts, source credits) alongside its existing JSON/CSV/XLSX output.</div>
+          <div class="impacts">
+            <span class="label">Impacts</span>
+            <code class="tag">graveyard.py</code>
+            <code class="tag">main() — new metadata block</code>
+          </div>
+        </li>
+        <li>
+          <div class="desc">Added a GitHub Actions workflow that runs graveyard.py daily (plus on-demand and on pushes touching graveyard.py) and commits the refreshed snapshot back to the repo — this is what keeps the "database" current without a server.</div>
+          <div class="impacts">
+            <span class="label">Impacts</span>
+            <code class="tag">.github/workflows/refresh-data.yml — new</code>
+          </div>
+        </li>
+        <li>
+          <div class="desc">graveyard.html no longer calls the three upstream sources itself — it now reads the committed graveyard_all.json snapshot instead, removing the duplicated JS parsing logic entirely.</div>
+          <div class="impacts">
+            <span class="label">Impacts</span>
+            <code class="tag">graveyard.html</code>
+            <code class="tag">removed: SOURCES/parseKbg()/parseKba()/PARSERS/clean()/yr()</code>
+            <code class="tag">added: DATA_URL/META_URL</code>
+            <code class="tag">computeStatus() — new</code>
+            <code class="tag">loadMeta() — new</code>
+            <code class="tag">load() — rewritten</code>
+            <code class="tag">buildChips() — rewritten</code>
+            <code class="tag">render() — simplified</code>
+          </div>
+        </li>
+        <li>
+          <div class="desc">Documented the new snapshot architecture and updated usage instructions.</div>
+          <div class="impacts">
+            <span class="label">Impacts</span>
+            <code class="tag">README.md</code>
+            <span class="none">no code impact</span>
+          </div>
+        </li>
+      </ul>
+    </article>
+
+    <article class="entry">
+      <div class="entry-head">
         <span class="ver">v0.4.1</span>
         <span class="entry-title">Accent color matched to the glass theme</span>
         <span class="date">2026-08-13</span>

@@ -8,6 +8,40 @@ This project doesn't publish releases/tags — "version" here just numbers
 each meaningful round of changes in order (loosely following
 [Keep a Changelog](https://keepachangelog.com/) style: Added / Changed / Fixed).
 
+## [0.5.0] - 2026-08-17 — Static data snapshot ("database") instead of live client-side fetch
+
+### Added
+- `graveyard.py` now also writes `graveyard_all.meta.json` (generation
+  timestamp, per-company counts, source credits) alongside its existing
+  JSON/CSV/XLSX output.
+  **Impacts:** `graveyard.py` — `main()` (new metadata block, `timezone`
+  import added)
+- `.github/workflows/refresh-data.yml` — runs `graveyard.py` daily (plus
+  on-demand and on pushes touching `graveyard.py`) and commits the
+  refreshed snapshot back to the repo. This is what keeps the "database"
+  current without a server.
+  **Impacts:** new file, no code touched
+
+### Changed
+- `graveyard.html` no longer calls the three upstream sources itself. It
+  now reads the committed `graveyard_all.json` snapshot instead, removing
+  the JS reimplementation of the parsing logic entirely.
+  **Impacts:** `graveyard.html`
+  - Removed: `SOURCES` (the 3 CDN URLs), `parseKbg()`, `parseKba()`,
+    `PARSERS`, `clean()`, `yr()`
+  - Added: `DATA_URL`/`META_URL` constants, `computeStatus()` (recomputes
+    dead/scheduled client-side from each row's own date, so status stays
+    accurate between snapshot refreshes without re-fetching anything),
+    `loadMeta()` (populates the "last updated" line)
+  - Rewritten: `load()` (single local fetch + friendlier error message),
+    `buildChips()` (company list now derived from the data instead of a
+    hardcoded source list), `render()` (dropped the now-unused fetch-error
+    parameter)
+  - Copy updated: header subtitle, footer, loading/error messages
+- `README.md` — documented the new snapshot architecture and updated the
+  usage instructions accordingly.
+  **Impacts:** `README.md` — no code impact
+
 ## [0.4.1] - 2026-08-13 — Accent color matched to the glass theme
 
 ### Changed

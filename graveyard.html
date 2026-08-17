@@ -126,7 +126,8 @@
 <div class="app">
   <header>
     <h1>🪦 <span class="grad">Big Tech Graveyard</span></h1>
-    <div class="sub">Dữ liệu kéo trực tiếp từ Killed by Google / Microsoft / Apple qua jsDelivr CDN — luôn mới, không cần scrape.</div>
+    <div class="sub">Dữ liệu được tổng hợp định kỳ từ Killed by Google / Microsoft / Apple vào <code>graveyard_all.json</code> — trang này chỉ đọc file đó, không tự gọi 3 nguồn khi tải.</div>
+    <div class="sub" id="updated"></div>
   </header>
 
   <div class="wrap">
@@ -145,68 +146,43 @@
       <button id="json">⬇ Tải JSON</button>
     </div>
 
-    <div id="out"><div class="loading"><div class="spinner"></div><div class="msg">Đang tải 3 nguồn…</div></div></div>
+    <div id="out"><div class="loading"><div class="spinner"></div><div class="msg">Đang tải graveyard_all.json…</div></div></div>
   </div>
 
   <footer>
-    Nguồn: <a href="https://killedbygoogle.com/">killedbygoogle.com</a> ·
+    Nguồn dữ liệu gốc: <a href="https://killedbygoogle.com/">killedbygoogle.com</a> ·
     <a href="https://killedbymicrosoft.info/">killedbymicrosoft.info</a> ·
     <a href="https://killedbyapple.theden.sh/">killedbyapple.theden.sh</a><br>
+    Được tổng hợp định kỳ bằng <code>graveyard.py</code> qua GitHub Actions — xem <a href="graveyard_all.json">graveyard_all.json</a>.<br>
     Lưu ý: dữ liệu Apple chỉ có độ chính xác theo <b>năm</b> (born/died), Google & Microsoft có <b>ngày</b>.<br>
     <a href="changelog.html">📜 Changelog</a>
   </footer>
 </div>
 
 <script>
-const SOURCES = [
-  { company:'Google',    url:'https://cdn.jsdelivr.net/gh/codyogden/killedbygoogle@main/graveyard.json',        parser:'kbg', credit:'killedbygoogle.com' },
-  { company:'Microsoft', url:'https://cdn.jsdelivr.net/gh/fabianoriccardi/killed-by-microsoft@main/graveyard.json', parser:'kbg', credit:'killedbymicrosoft.info' },
-  { company:'Apple',     url:'https://cdn.jsdelivr.net/gh/TheDen/killed-by-apple@main/products.json',            parser:'kba', credit:'killedbyapple.theden.sh' },
-];
+// "Database" của trang: một snapshot JSON tĩnh do graveyard.py tạo sẵn
+// (xem .github/workflows/refresh-data.yml) — không còn gọi trực tiếp 3
+// nguồn Killed by Google/Microsoft/Apple từ trình duyệt nữa, nên logic
+// parse/dedupe cũng không còn bị lặp lại giữa Python và JS.
+const DATA_URL = 'graveyard_all.json';
+const META_URL = 'graveyard_all.meta.json';
+const COMPANY_ORDER = ['Google', 'Microsoft', 'Apple']; // thứ tự chip ưu tiên; công ty khác xếp sau, theo alphabet
 
 const TODAY = new Date();
 const REDUCE_MOTION = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const clean = s => String(s ?? '').replace(/\s+/g,' ').trim();
-const yr = s => { const d = new Date(s); return isNaN(d) ? null : d.getFullYear(); };
-
-// Killed by Google / Microsoft dùng chung schema
-function parseKbg(raw, company, credit){
-  return raw.map(it => {
-    const o = it.dateOpen ? new Date(it.dateOpen) : null;
-    const c = it.dateClose ? new Date(it.dateClose) : null;
-    return {
-      company, name: clean(it.name), type: clean(it.type).toLowerCase() || null,
-      date_open: it.dateOpen || null, date_close: it.dateClose || null,
-      year_open: yr(it.dateOpen), year_close: yr(it.dateClose),
-      date_precision: 'day',
-      lifespan_years: (o && c) ? +((c - o)/(365.25*864e5)).toFixed(1) : null,
-      status: (c && c > TODAY) ? 'scheduled' : 'dead',
-      description: clean(it.description), link: clean(it.link), source: credit
-    };
-  });
-}
-
-// Killed by Apple: chỉ có năm
-function parseKba(raw, company, credit){
-  const items = Array.isArray(raw) ? raw : (raw.products || []);
-  return items.map(it => ({
-    company, name: clean(it.name),
-    type: (it.cats || []).join(', ').toLowerCase() || null,
-    date_open: null, date_close: null,
-    year_open: it.born ?? null, year_close: it.died ?? null,
-    date_precision: 'year',
-    lifespan_years: (it.born && it.died) ? (it.died - it.born) : null,
-    status: (it.died && it.died > TODAY.getFullYear()) ? 'scheduled' : 'dead',
-    description: clean(it.desc),
-    link: (it.refs && it.refs[0] && it.refs[0].url) || '', source: credit
-  }));
-}
-
-const PARSERS = { kbg: parseKbg, kba: parseKba };
 const FIELDS = ['company','name','type','date_open','date_close','year_open','year_close',
                 'date_precision','lifespan_years','status','description','link','source'];
 
 let ALL = [], active = new Set(), sortKey = 'year_close', sortDir = -1;
+
+// graveyard_all.json là snapshot — có thể vài giờ/ngày tuổi. Tính lại
+// "dead" / "scheduled" theo ngày hiện tại của người xem thay vì tin
+// nguyên trạng thái đã đóng gói, để không bị lệch giữa các lần làm mới.
+function computeStatus(r){
+  if(r.date_precision === 'day' && r.date_close) return new Date(r.date_close) > TODAY ? 'scheduled' : 'dead';
+  if(r.year_close) return r.year_close > TODAY.getFullYear() ? 'scheduled' : 'dead';
+  return r.status || 'dead';
+}
 
 // Đếm số chạy mượt từ giá trị cũ -> mới (bỏ qua nếu prefers-reduced-motion)
 function animateCount(el, from, to, decimals = 0){
@@ -226,42 +202,50 @@ function animateCount(el, from, to, decimals = 0){
 }
 
 async function load(){
-  const results = await Promise.allSettled(SOURCES.map(async s => {
-    const r = await fetch(s.url);
-    if(!r.ok) throw new Error(s.company + ': HTTP ' + r.status);
-    return PARSERS[s.parser](await r.json(), s.company, s.credit);
-  }));
-
-  const errs = [];
-  results.forEach((r,i) => {
-    if(r.status === 'fulfilled') ALL.push(...r.value);
-    else errs.push(SOURCES[i].company + ' — ' + r.reason.message);
-  });
-
-  if(!ALL.length){
+  let rows;
+  try{
+    const r = await fetch(DATA_URL, { cache: 'no-store' });
+    if(!r.ok) throw new Error('HTTP ' + r.status);
+    rows = await r.json();
+    if(!Array.isArray(rows) || !rows.length) throw new Error('file rỗng hoặc sai định dạng');
+  }catch(e){
     document.getElementById('out').innerHTML =
-      '<div class="msg err">Không tải được nguồn nào.<br>' + errs.join('<br>') +
-      '<br><br>Nếu bạn mở file này bằng file:// và trình duyệt chặn, hãy chạy:<br>' +
-      '<code>python3 -m http.server</code> rồi mở qua localhost.</div>';
+      `<div class="msg err">Không đọc được <code>${DATA_URL}</code>: ${e.message}.<br><br>` +
+      `File này do <code>python3 graveyard.py</code> tạo ra — có thể bạn chưa chạy script, hoặc ` +
+      `đang mở trang bằng <code>file://</code> và trình duyệt chặn <code>fetch()</code> cục bộ.<br><br>` +
+      `Hãy chạy: <code>python3 graveyard.py && python3 -m http.server</code> rồi mở qua localhost.</div>`;
     return;
   }
 
-  // dedupe (company + name)
-  const seen = new Map();
-  ALL.forEach(r => seen.set(r.company + '|' + r.name.toLowerCase(), r));
-  ALL = [...seen.values()];
+  ALL = rows.map(r => ({ ...r, status: computeStatus(r) }));
+  active = new Set(ALL.map(r => r.company));
+  buildChips(); buildTypes(); render();
+  loadMeta();
+}
 
-  active = new Set(SOURCES.map(s => s.company));
-  buildChips(); buildTypes(); render(errs);
+// Không bắt buộc — chỉ để hiện "cập nhật lần cuối". Lỗi ở đây không chặn trang chính.
+async function loadMeta(){
+  try{
+    const r = await fetch(META_URL, { cache: 'no-store' });
+    if(!r.ok) return;
+    const meta = await r.json();
+    const el = document.getElementById('updated');
+    if(el && meta.generated_at) el.textContent = 'Cập nhật lần cuối: ' + new Date(meta.generated_at).toLocaleString('vi-VN');
+  }catch(e){ /* im lặng bỏ qua */ }
 }
 
 function buildChips(){
   const el = document.getElementById('companyChips');
   el.innerHTML = '';
-  SOURCES.forEach(s => {
+  const present = [...new Set(ALL.map(r => r.company))];
+  const ordered = [
+    ...COMPANY_ORDER.filter(c => present.includes(c)),
+    ...present.filter(c => !COMPANY_ORDER.includes(c)).sort(),
+  ];
+  ordered.forEach(company => {
     const b = document.createElement('button');
-    b.className = 'chip on'; b.textContent = s.company;
-    b.onclick = () => { active.has(s.company) ? active.delete(s.company) : active.add(s.company);
+    b.className = 'chip on'; b.textContent = company;
+    b.onclick = () => { active.has(company) ? active.delete(company) : active.add(company);
                         b.classList.toggle('on'); render(); };
     el.appendChild(b);
   });
@@ -316,7 +300,7 @@ function renderStats(rows){
   });
 }
 
-function render(errs = []){
+function render(){
   const rows = filtered();
   const maxLife = Math.max(...ALL.map(r => r.lifespan_years || 0), 1);
 
@@ -328,7 +312,7 @@ function render(errs = []){
     ['lifespan_years','Tuổi thọ'], ['description','Mô tả']
   ];
 
-  let h = (errs.length ? `<div class="msg err">⚠ ${errs.join(' · ')}</div>` : '') +
+  let h =
     '<table><thead><tr>' +
     cols.map(([k,l]) => `<th data-k="${k}">${l}${sortKey===k ? (sortDir>0?' ▲':' ▼') : ''}</th>`).join('') +
     '</tr></thead><tbody>';
