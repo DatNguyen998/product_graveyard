@@ -1,0 +1,46 @@
+name: Refresh graveyard data
+
+# Keeps graveyard_all.json (+ .csv / .meta.json) current. This is the
+# project's "database": graveyard.py fetches the 3 upstream sources and
+# writes a normalized snapshot, which this workflow commits back to the
+# repo on a schedule. graveyard.html only ever reads that committed
+# snapshot — it never calls the upstream sources itself.
+
+on:
+  schedule:
+    - cron: '0 6 * * *' # daily at 06:00 UTC
+  workflow_dispatch: {} # allow manual "Run workflow" too
+  push:
+    branches: [main]
+    paths:
+      - graveyard.py
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Run aggregator
+        run: python3 graveyard.py
+
+      - name: Commit snapshot if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add graveyard_all.json graveyard_all.csv graveyard_all.meta.json
+          if git diff --cached --quiet; then
+            echo "No data changes — nothing to commit."
+          else
+            git commit -m "chore: refresh graveyard data snapshot"
+            git push
+          fi

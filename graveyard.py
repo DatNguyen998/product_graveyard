@@ -12,7 +12,12 @@ Chạy:
   python3 build_graveyard.py --xlsx          # thêm Excel (cần: pip install openpyxl)
 
 Output:
-  graveyard_all.json / graveyard_all.csv / graveyard_all.xlsx
+  graveyard_all.json / graveyard_all.csv / graveyard_all.xlsx / graveyard_all.meta.json
+
+Đây cũng là "database" tĩnh của web UI (graveyard.html): dashboard KHÔNG gọi
+3 nguồn ở trên trực tiếp nữa, nó chỉ đọc graveyard_all.json đã được script này
+tạo sẵn (xem .github/workflows/refresh-data.yml để biết cách file này được
+làm mới định kỳ).
 """
 
 import argparse
@@ -20,7 +25,7 @@ import csv
 import json
 import sys
 import urllib.request
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 
 # --------------------------------------------------------------------------
 # Cấu hình nguồn. Dùng cdn.jsdelivr.net thay vì raw.githubusercontent vì
@@ -241,7 +246,19 @@ def main():
         w = csv.DictWriter(f, fieldnames=FIELDS)
         w.writeheader()
         w.writerows(rows)
-    print(f"\n✓ {args.out}.json\n✓ {args.out}.csv")
+
+    # Metadata nhỏ đi kèm — web UI đọc file này để hiện "cập nhật lần cuối".
+    meta = {
+        "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "total": len(rows),
+        "by_company": {company: n for company, n, status in report if status == "ok"},
+        "duplicates_removed": dupes,
+        "sources": [{"company": s["company"], "credit": s["credit"]} for s in SOURCES],
+    }
+    with open(f"{args.out}.meta.json", "w", encoding="utf-8") as f:
+        json.dump(meta, f, ensure_ascii=False, indent=2)
+
+    print(f"\n✓ {args.out}.json\n✓ {args.out}.csv\n✓ {args.out}.meta.json")
 
     if args.xlsx:
         try:

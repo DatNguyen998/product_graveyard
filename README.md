@@ -11,12 +11,25 @@ web dashboard for browsing, filtering, and sorting the carnage.
 
 | File | Purpose |
 |---|---|
-| [`graveyard.py`](graveyard.py) | CLI script that fetches all three sources, merges/dedupes them into one schema, runs basic QA checks, and exports JSON/CSV (optionally XLSX). |
-| [`graveyard.html`](graveyard.html) | Standalone, no-build-step dashboard. Fetches the same sources live in the browser and renders a sortable, filterable, searchable table. |
+| [`graveyard.py`](graveyard.py) | CLI script that fetches all three sources, merges/dedupes them into one schema, runs basic QA checks, and exports `graveyard_all.json` / `.csv` / `.meta.json` (optionally `.xlsx`). |
+| [`graveyard.html`](graveyard.html) | Standalone, no-build-step dashboard. Reads `graveyard_all.json` and renders a sortable, filterable, searchable table. |
+| [`changelog.html`](changelog.html) | Version history view, styled to match the dashboard — see [`CHANGELOG.md`](CHANGELOG.md) for the plain-text source. |
+| [`.github/workflows/refresh-data.yml`](.github/workflows/refresh-data.yml) | Runs `graveyard.py` daily (and on demand) and commits the refreshed snapshot back to the repo. |
 
-Data is always pulled fresh from source via [jsDelivr](https://www.jsdelivr.com/) CDN mirrors of the
-respective GitHub repos — nothing is scraped or vendored, so both the script and the page reflect the
-latest known deaths (and scheduled ones) each time you run them.
+### Architecture: static snapshot, not a live client-side fetch
+
+`graveyard.py` is the only thing that talks to the three upstream sources ([jsDelivr](https://www.jsdelivr.com/)
+CDN mirrors of their GitHub repos). It writes a normalized snapshot — `graveyard_all.json` — which acts
+as this project's "database." `graveyard.html` only ever reads that committed file; it does **not** call
+the upstream sources itself. A [GitHub Actions workflow](.github/workflows/refresh-data.yml) re-runs the
+script daily (and on every push that touches `graveyard.py`, or manually via "Run workflow") and commits
+the updated snapshot, so the dashboard stays current without needing a server or a real database — it's
+still just static files.
+
+One wrinkle a static snapshot introduces: whether a product counts as `"dead"` or `"scheduled"` depends
+on today's date, which drifts between refreshes. `graveyard.html` recomputes that status client-side from
+each row's `date_close`/`year_close` against the viewer's own clock, so it stays accurate even if the
+snapshot is a few days old.
 
 ## Data schema
 
@@ -45,21 +58,26 @@ Add `--xlsx` to also produce an Excel workbook (requires `pip install openpyxl`)
 python3 graveyard.py --xlsx
 ```
 
-Outputs `graveyard_all.json`, `graveyard_all.csv`, and (with `--xlsx`) `graveyard_all.xlsx` in the
-current directory. Use `--out <name>` to change the output filename prefix. The script also prints a
-per-source summary, a breakdown of shutdowns by decade, and any QA warnings it finds (e.g. missing
-death year, death date before launch date).
+Outputs `graveyard_all.json`, `graveyard_all.csv`, `graveyard_all.meta.json` (generation timestamp +
+per-source counts, used by the dashboard's "last updated" line), and — with `--xlsx` —
+`graveyard_all.xlsx`, all in the current directory. Use `--out <name>` to change the output filename
+prefix (the dashboard expects the default `graveyard_all` prefix, so only change it for one-off exports).
+The script also prints a per-source summary, a breakdown of shutdowns by decade, and any QA warnings it
+finds (e.g. missing death year, death date before launch date).
 
 ### Web dashboard
 
-Just open `graveyard.html` in a browser — it fetches all three sources client-side. Since it uses
-`fetch()`, opening it directly via `file://` may be blocked by some browsers; if so, serve it locally:
+Run `python3 graveyard.py` at least once to produce `graveyard_all.json`, then open `graveyard.html` in
+a browser — it reads that file via `fetch()`, which some browsers block when opening the page directly
+via `file://`. If so, serve it locally instead:
 
 ```bash
 python3 -m http.server
 ```
 
-then visit `http://localhost:8000/graveyard.html`.
+then visit `http://localhost:8000/graveyard.html`. In production this repo's
+[GitHub Actions workflow](.github/workflows/refresh-data.yml) keeps `graveyard_all.json` refreshed for
+you, so you don't need to run the script yourself unless you're developing locally.
 
 The dashboard lets you:
 - Toggle sources on/off (Google / Microsoft / Apple)
