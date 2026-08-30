@@ -90,7 +90,10 @@ The dashboard lets you:
 
 - Python 3.7+ (standard library only — no dependencies needed for JSON/CSV output)
 - `openpyxl` only if using `--xlsx`
-- Any modern browser for `graveyard.html`
+- Any modern browser for `graveyard.html` / `changelog.html`. Both load
+  [Anime.js](https://animejs.com/) from cdnjs for animation — this needs
+  outbound internet access; if it's blocked, both pages still work
+  correctly, just without motion.
 
 ## Credits
 

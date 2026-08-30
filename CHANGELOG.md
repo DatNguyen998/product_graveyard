@@ -8,6 +8,48 @@ This project doesn't publish releases/tags — "version" here just numbers
 each meaningful round of changes in order (loosely following
 [Keep a Changelog](https://keepachangelog.com/) style: Added / Changed / Fixed).
 
+## [0.6.0] - 2026-08-30 — Animation engine swapped to Anime.js
+
+### Added
+- [Anime.js](https://animejs.com/) v3.2.1 (cdnjs) as the animation engine
+  for both pages, loaded via a pinned CDN `<script>` tag. All animation is
+  progressive enhancement: if the CDN is blocked/unreachable, `HAS_ANIME`
+  is `false`, `<html>` gets a `.no-anime` class, and both pages still work
+  correctly — just without motion (a small CSS-only fallback keeps the
+  spinner spinning and the "scheduled" badge pulsing in that case).
+  **Impacts:** `graveyard.html`, `changelog.html` — new `<script src=cdnjs.../anime.min.js>` tag
+- `graveyard.html`: a FLIP-style reorder animation — row positions from
+  before a sort/filter are captured and animated into their new position,
+  instead of the table just jumping. New rows revealed by a filter still
+  fade/slide in as before. Skipped automatically above 150 visible rows
+  to avoid layout-thrashing jank.
+  **Impacts:** `graveyard.html` — `render()` (rewritten), new `keyOf()`
+- `graveyard.html`: an `anime.timeline()` sequences the initial page
+  reveal (card → stats → controls) instead of all three fading in at once.
+  **Impacts:** `graveyard.html` — new `introAnimation()`
+- `graveyard.html`: a small scale "pop" on company chip click.
+  **Impacts:** `graveyard.html` — `buildChips()`
+- `changelog.html`: matching entrance treatment — card fades in, then each
+  timeline entry staggers in via `anime.stagger()`.
+  **Impacts:** `changelog.html` — new inline `<script>` block
+
+### Changed
+- Replaced every hand-rolled animation with an Anime.js equivalent:
+  stat count-up, table-row entrance, lifespan-bar growth, the "scheduled"
+  badge pulse, and the loading spinner.
+  **Impacts:** `graveyard.html`
+  - `animateCount()` — rewritten to tween a plain object via `anime()`
+    instead of a manual `requestAnimationFrame` loop
+  - Removed the old CSS `@keyframes fadeInUp` (unused now) and the
+    `animation:` declarations on `.app`, `tr`, `.sched`, `.spinner`
+  - New `schedPulseAnim` (module-level instance, paused and replaced on
+    every `renderStats()` call — needed because the badge's DOM node is
+    recreated each render, so a stale `loop:true` instance would otherwise
+    keep ticking in the background indefinitely)
+- `changelog.html`: same swap — `@keyframes fadeInUp` and the `animation:`
+  declarations on `.app`/`.entry` removed in favor of the Anime.js timeline.
+  **Impacts:** `changelog.html`
+
 ## [0.5.0] - 2026-08-17 — Static data snapshot ("database") instead of live client-side fetch
 
 ### Added

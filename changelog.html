@@ -46,7 +46,6 @@
     border-radius:22px;
     box-shadow:var(--glass-shadow);
     overflow:hidden;
-    animation:fadeInUp .5s var(--ease) both;
   }
   header{position:relative;padding:26px 28px 18px;border-bottom:1px solid var(--border-soft)}
   .back{display:inline-flex;align-items:center;gap:6px;color:var(--muted);text-decoration:none;
@@ -61,7 +60,7 @@
     content:'';position:absolute;left:47px;top:26px;bottom:34px;width:2px;
     background:linear-gradient(var(--accent),var(--accent-2));opacity:.25;
   }
-  .entry{position:relative;padding:0 0 30px 46px;animation:fadeInUp .45s var(--ease) both}
+  .entry{position:relative;padding:0 0 30px 46px}
   .entry:last-child{padding-bottom:0}
   .entry::before{
     content:'';position:absolute;left:14px;top:5px;width:11px;height:11px;border-radius:50%;
@@ -96,7 +95,6 @@
   footer a{color:var(--accent);text-decoration:none}
   footer a:hover{color:var(--changed)}
 
-  @keyframes fadeInUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
   @media (prefers-reduced-motion: reduce){
     *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important}
   }
@@ -111,6 +109,62 @@
   </header>
 
   <div class="timeline">
+
+    <article class="entry">
+      <div class="entry-head">
+        <span class="ver">v0.6.0</span>
+        <span class="entry-title">Animation engine swapped to Anime.js</span>
+        <span class="date">2026-08-30</span>
+      </div>
+      <div class="badges"><span class="badge added">Added</span><span class="badge changed">Changed</span></div>
+      <ul class="changes">
+        <li>
+          <div class="desc">Anime.js v3.2.1 (cdnjs) is now the animation engine for both pages, loaded via a pinned CDN script tag. All animation is progressive enhancement — if the CDN is blocked, both pages still work correctly, just without motion (a small CSS fallback keeps the spinner and "scheduled" pulse going).</div>
+          <div class="impacts">
+            <span class="label">Impacts</span>
+            <code class="tag">graveyard.html</code>
+            <code class="tag">changelog.html</code>
+            <code class="tag">new &lt;script src=cdnjs.../anime.min.js&gt;</code>
+          </div>
+        </li>
+        <li>
+          <div class="desc">Added a FLIP-style reorder animation for table rows on sort/filter (captures old position, animates into the new one) instead of the table jumping. New rows still fade/slide in. Skipped above 150 visible rows to avoid jank.</div>
+          <div class="impacts">
+            <span class="label">Impacts</span>
+            <code class="tag">graveyard.html</code>
+            <code class="tag">render() — rewritten</code>
+            <code class="tag">keyOf() — new</code>
+          </div>
+        </li>
+        <li>
+          <div class="desc">Added an anime.timeline() to sequence the initial page reveal (card → stats → controls), and a small scale "pop" on company chip click.</div>
+          <div class="impacts">
+            <span class="label">Impacts</span>
+            <code class="tag">graveyard.html</code>
+            <code class="tag">introAnimation() — new</code>
+            <code class="tag">buildChips()</code>
+          </div>
+        </li>
+        <li>
+          <div class="desc">Replaced every hand-rolled animation (stat count-up, row entrance, bar growth, scheduled-badge pulse, loading spinner) with an Anime.js equivalent. animateCount() now tweens a plain object via anime() instead of a manual requestAnimationFrame loop.</div>
+          <div class="impacts">
+            <span class="label">Impacts</span>
+            <code class="tag">graveyard.html</code>
+            <code class="tag">animateCount() — rewritten</code>
+            <code class="tag">removed: @keyframes fadeInUp</code>
+            <code class="tag">schedPulseAnim — new (paused/replaced each render)</code>
+          </div>
+        </li>
+        <li>
+          <div class="desc">This page got the same treatment: card fades in, then each timeline entry staggers in via anime.stagger(), replacing the old CSS @keyframes fadeInUp.</div>
+          <div class="impacts">
+            <span class="label">Impacts</span>
+            <code class="tag">changelog.html</code>
+            <code class="tag">new inline &lt;script&gt; block</code>
+          </div>
+        </li>
+      </ul>
+    </article>
 
     <article class="entry">
       <div class="entry-head">
@@ -332,5 +386,22 @@
     Generated from git history — see <code class="tag">CHANGELOG.md</code> in the repo root for the plain-text version.
   </footer>
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+<script>
+// Cùng engine hiệu ứng với graveyard.html (xem file đó để biết lý do và
+// cách xử lý khi thư viện tải lỗi). Trang này chỉ có 1 hoạt cảnh: card
+// xuất hiện rồi từng mốc thời gian nối đuôi nhau bằng anime.stagger().
+const REDUCE_MOTION = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const ANIMATE = typeof anime === 'function' && !REDUCE_MOTION;
+
+if(ANIMATE){
+  anime.set('.app', { opacity: 0, translateY: 10 });
+  anime.set('.entry', { opacity: 0, translateY: 10 });
+  anime.timeline({ easing: 'easeOutCubic' })
+    .add({ targets: '.app', opacity: 1, translateY: 0, duration: 450 })
+    .add({ targets: '.entry', opacity: 1, translateY: 0, duration: 400, delay: anime.stagger(70) }, '-=250');
+}
+</script>
 </body>
 </html>
