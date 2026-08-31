@@ -1,0 +1,24 @@
+{
+  "generated_at": "2026-08-31T09:30:40Z",
+  "total": 656,
+  "by_company": {
+    "Google": 307,
+    "Microsoft": 208,
+    "Apple": 142
+  },
+  "duplicates_removed": 1,
+  "sources": [
+    {
+      "company": "Google",
+      "credit": "killedbygoogle.com"
+    },
+    {
+      "company": "Microsoft",
+      "credit": "killedbymicrosoft.info"
+    },
+    {
+      "company": "Apple",
+      "credit": "killedbyapple.theden.sh"
+    }
+  ]
+}
