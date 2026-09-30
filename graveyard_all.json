@@ -1,6 +1,21 @@
 [
   {
     "company": "Google",
+    "name": "ChromeOS",
+    "type": "app",
+    "date_open": "2011-06-15",
+    "date_close": "2034-06-30",
+    "year_open": 2011,
+    "year_close": 2034,
+    "date_precision": "day",
+    "lifespan_years": 23.0,
+    "status": "scheduled",
+    "description": "ChromeOS was an operating system that powered Chromebooks, Chromeboxes, tablets, and other devices.",
+    "link": "https://en.wikipedia.org/wiki/ChromeOS",
+    "source": "killedbygoogle.com"
+  },
+  {
+    "company": "Google",
     "name": "Google Earth Pro",
     "type": "app",
     "date_open": "2001-06-10",
