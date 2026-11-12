@@ -16,6 +16,21 @@
   },
   {
     "company": "Google",
+    "name": "Firebase Test Lab",
+    "type": "service",
+    "date_open": "2016-06-29",
+    "date_close": "2027-09-30",
+    "year_open": 2016,
+    "year_close": 2027,
+    "date_precision": "day",
+    "lifespan_years": 11.3,
+    "status": "scheduled",
+    "description": "Firebase Test Lab was a cloud-based testing service for running automated tests on emulated and real Android and iOS devices.",
+    "link": "https://firebase.google.com/support/releases#september_30_2026",
+    "source": "killedbygoogle.com"
+  },
+  {
+    "company": "Google",
     "name": "Google Earth Pro",
     "type": "app",
     "date_open": "2001-06-10",
@@ -42,6 +57,21 @@
     "status": "scheduled",
     "description": "Firebase Studio is an agentic, cloud-based development environment that gives you powerful tools and AI agents directly in your browser.",
     "link": "https://firebase.google.com/docs/studio/migrating-project",
+    "source": "killedbygoogle.com"
+  },
+  {
+    "company": "Google",
+    "name": "Google Jules",
+    "type": "service",
+    "date_open": "2025-05-20",
+    "date_close": "2026-12-31",
+    "year_open": 2025,
+    "year_close": 2026,
+    "date_precision": "day",
+    "lifespan_years": 1.6,
+    "status": "scheduled",
+    "description": "Google Jules was an asynchronous, cloud-based AI coding agent that worked on tasks in GitHub repositories and opened pull requests.",
+    "link": "https://web.archive.org/web/20261029192234/https://jules.google/docs/changelog/2026-10-29/",
     "source": "killedbygoogle.com"
   },
   {
@@ -148,6 +178,21 @@
     "description": "3D Viewer (formerly Mixed Reality Viewer and before that, View 3D) was a 3D computer graphics viewer and augmented reality application that was first included in Windows 10 1703.",
     "link": "https://en.wikipedia.org/wiki/Microsoft_3D_Viewer",
     "source": "killedbymicrosoft.info"
+  },
+  {
+    "company": "Google",
+    "name": "Google Gemini (CLI and Code Assist)",
+    "type": "app",
+    "date_open": "2025-06-25",
+    "date_close": "2026-06-18",
+    "year_open": 2025,
+    "year_close": 2026,
+    "date_precision": "day",
+    "lifespan_years": 1.0,
+    "status": "dead",
+    "description": "Google Gemini CLI and consumer-level versions of Gemini Code Assist were AI development tools that integrated Gemini capabilities directly into terminal and IDE environments for individual users. They were discontinued in favor of the unified Antigravity platform.",
+    "link": "https://github.com/google-gemini/gemini-cli",
+    "source": "killedbygoogle.com"
   },
   {
     "company": "Google",
